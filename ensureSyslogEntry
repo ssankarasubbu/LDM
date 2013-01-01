@@ -1,20 +1,91 @@
-LOG_LDM=${1?LDM logging facility not set}
+# This script modifies the configuration-file for the system logging daemon as
+# necessary to ensure that the LDM logs to its log file.
+
+LDM_FACILITY=${1?LDM logging facility not set}
 SYSLOG_CONF=${2?System logging configuration-file not set}
 LDM_LOGFILE=${3?LDM log file pathname not set}
+NEEDS_TEMPLATE=${4-0}
 
-if grep ${LOG_LDM} ${SYSLOG_CONF} >/dev/null; then
-    : true
-else
-    awk '
-        {print}
-        NF == 2 && ($1 ~ /\.none/ || $2 ~ /\/var\/log\/messages/ || 
-                $2 ~ /\/var\/log\/syslog/) {
-            print "'${LOG_LDM}'.none	" $2;
+awk "
+    function ensureCommentLine() {
+        if (!commentLinePrinted) {
+            print \"\";
+            print \"#Unidata LDM:\";
+            commentLinePrinted = 1;
         }
-    ' ${SYSLOG_CONF} >${SYSLOG_CONF}.new &&
-    echo >>${SYSLOG_CONF}.new &&
-    echo '# Unidata LDM:' >>${SYSLOG_CONF}.new &&
-    echo "${LOG_LDM}.debug	${LDM_LOGFILE}" >>${SYSLOG_CONF}.new &&
-    cp ${SYSLOG_CONF} ${SYSLOG_CONF}.old &&
-    mv -f ${SYSLOG_CONF}.new ${SYSLOG_CONF}
+    }
+    function ensureTemplateLine() {
+        #
+        # This template entry ensures that the timestamps are in UTC. This is
+        # necessary for rsyslogd(8) version 5 and above.
+        #
+        if (!templateLinePrinted) {
+            ensureCommentLine();
+            print \"\$template ldm, \\\"%rawmsg:6:20% %hostname% %rawmsg:22:255%\\\n\\\"\";
+            templateLinePrinted = 1;
+        }
+    }
+    function ensureLogLine() {
+        if (!logLinePrinted) {
+            ensureCommentLine();
+            if ($NEEDS_TEMPLATE) {
+                ensureTemplateLine();
+                print \"${LDM_FACILITY}.debug	${LDM_LOGFILE} ; ldm\";
+            }
+            else {
+                print \"${LDM_FACILITY}.debug	${LDM_LOGFILE}\";
+            }
+            logLinePrinted = 1;
+        }
+    }
+    NF == 2 && (\$1 ~ /\.none/ || \$2 ~ /\/var\/log\/messages/ || 
+            \$2 ~ /\/var\/log\/syslog/) {
+        #
+        # Ensure that there's no logging to the system log file. It's assumed
+        # that at least one such "none" entry exists.
+        #
+        if (\$1 !~ /${LDM_FACILITY}\.none/) {
+            \$0 = \$1 \";${LDM_FACILITY}.none\\t\" \$2;
+        }
+        if (!noneLinePrinted) {
+            print;
+            noneLinePrinted = 1;
+        }
+        next;
+    }
+    /^#/ && /Unidata/ && /LDM/ {
+        #
+        # There's an existing "Unidata LDM" comment line. Use it.
+        #
+        commentLinePrinted = 1;
+    }
+    /^\$template[\\t ]+ldm/ {
+        #
+        # There's an existing template line for LDM logging. Use it.
+        #
+        templateLinePrinted = 1;
+    }
+    /^${LDM_FACILITY}\.(debug|info|notice|warn|err|crit|alert|emerg|panic|\\*)/ {
+        #
+        # There's an existing entry for LDM logging. Use it.
+        #
+        ensureLogLine();
+        next;
+    }
+    {print}
+    END {
+        #
+        # Ensure that an entry exists for LDM logging.
+        #
+        ensureLogLine();
+    }
+" <${SYSLOG_CONF} >${SYSLOG_CONF}.new &&
+
+if test -s ${SYSLOG_CONF}.new; then
+    if cmp -s ${SYSLOG_CONF} ${SYSLOG_CONF}.new; then
+        rm -f ${SYSLOG_CONF}.new 
+    else
+        mv ${SYSLOG_CONF} ${SYSLOG_CONF}.old
+        mv ${SYSLOG_CONF}.new ${SYSLOG_CONF}
+    fi
 fi

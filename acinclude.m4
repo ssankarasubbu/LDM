@@ -204,6 +204,16 @@ AC_DEFUN([UD_PROG_NTPDATE], [dnl
 ])dnl
 
 
+dnl Find the rsyslogd(8) program.
+dnl
+AC_DEFUN([UD_PROG_RSYSLOGD], [dnl
+    AC_ARG_VAR([RSYSLOGD], [RSYSLOGD(8) utility])
+    AC_CACHE_VAL([ac_cv_path_RSYSLOGD],
+	[AC_PATH_PROG([RSYSLOGD], [rsyslogd], [rsyslogd],
+	    [/sbin$PATH_SEPARATOR/usr/sbin$PATH_SEPARATOR$PATH])])
+])dnl
+
+
 dnl Find the netstat(1) command.
 dnl
 AC_DEFUN([UD_PROG_NETSTAT], [dnl
@@ -459,6 +469,13 @@ AC_DEFUN([UD_ULOG], [dnl
     else
         AC_SUBST([LDM_LOGFILE], [$LDMHOME/var/logs/ldmd.log])
     fi
+    
+    case "$SYSLOG_CONF" in
+    *rsyslog*)
+        AC_PATH_PROG([SYSLOGD], [rsyslogd], [unset],
+            [/sbin$PATH_SEPARATOR/usr/sbin$PATH_SEPARATOR/bin$PATH_SEPARATOR/usr/bin$PATH_SEPARATOR$PATH])
+        ;;
+    esac
 
     case `uname -sr` in
 	OSF1*|sn1036*|Linux*|Darwin*)
