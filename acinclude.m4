@@ -204,16 +204,6 @@ AC_DEFUN([UD_PROG_NTPDATE], [dnl
 ])dnl
 
 
-dnl Find the rsyslogd(8) program.
-dnl
-AC_DEFUN([UD_PROG_RSYSLOGD], [dnl
-    AC_ARG_VAR([RSYSLOGD], [RSYSLOGD(8) utility])
-    AC_CACHE_VAL([ac_cv_path_RSYSLOGD],
-	[AC_PATH_PROG([RSYSLOGD], [rsyslogd], [rsyslogd],
-	    [/sbin$PATH_SEPARATOR/usr/sbin$PATH_SEPARATOR$PATH])])
-])dnl
-
-
 dnl Find the netstat(1) command.
 dnl
 AC_DEFUN([UD_PROG_NETSTAT], [dnl
@@ -472,10 +462,21 @@ AC_DEFUN([UD_ULOG], [dnl
     
     case "$SYSLOG_CONF" in
     *rsyslog*)
-        AC_PATH_PROG([SYSLOGD], [rsyslogd], [unset],
+        AC_PATH_PROG([SYSLOGD], [rsyslogd], [],
             [/sbin$PATH_SEPARATOR/usr/sbin$PATH_SEPARATOR/bin$PATH_SEPARATOR/usr/bin$PATH_SEPARATOR$PATH])
         ;;
     esac
+    AC_MSG_CHECKING([if system logging configuration-file needs a template entry])
+    needsTemplate=0
+	if echo "$SYSLOGD" | fgrep rsyslogd >/dev/null &&
+    	test `$SYSLOGD -v | awk '{split($[2],a,"\\\.");print a[[1]];exit}'` -gt 5; then
+        	AC_MSG_RESULT([yes])
+            AC_SUBST([SYSLOG_CONF_NEEDS_TEMPLATE], [1])
+    else
+    	AC_MSG_RESULT([no])
+        AC_SUBST([SYSLOG_CONF_NEEDS_TEMPLATE], [0])
+    fi
+    
 
     case `uname -sr` in
 	OSF1*|sn1036*|Linux*|Darwin*)

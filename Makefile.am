@@ -190,7 +190,8 @@ set these attributes manually."; \
 	fi
 
 ensure-syslog-entry:
-	$(srcdir)/ensureSyslogEntry $(LOG_LDM) $(SYSLOG_CONF) $(LDM_LOGFILE)
+	$(srcdir)/ensureSyslogEntry $(LOG_LDM) $(SYSLOG_CONF) $(LDM_LOGFILE) \
+    	$(SYSLOG_CONF_NEEDS_TEMPLATE)
 
 ensure-rpc-entry:
 	$(srcdir)/ensureRpcEntry
