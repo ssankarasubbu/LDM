@@ -55,7 +55,7 @@ awk "
     }
     /^#/ && /Unidata/ && /LDM/ {
         #
-        # There's an existing "Unidata LDM" comment line. Use it.
+        # There's an existing \"Unidata LDM\" comment line. Use it.
         #
         commentLinePrinted = 1;
     }
