@@ -467,9 +467,8 @@ AC_DEFUN([UD_ULOG], [dnl
         ;;
     esac
     AC_MSG_CHECKING([if system logging configuration-file needs a template entry])
-    needsTemplate=0
 	if echo "$SYSLOGD" | fgrep rsyslogd >/dev/null &&
-    	test `$SYSLOGD -v | awk '{split($[2],a,"\\\.");print a[[1]];exit}'` -gt 5; then
+    	test `$SYSLOGD -v | awk '{split($[2],a,"\\\.");print a[[1]];exit}'` -ge 5; then
         	AC_MSG_RESULT([yes])
             AC_SUBST([SYSLOG_CONF_NEEDS_TEMPLATE], [1])
     else
