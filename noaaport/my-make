@@ -1,0 +1,23 @@
+ gcc -c -O -DNDEBUG  -I.. -I./g2 -I./gempak -I./zlib -I/usr/local/ldm/ldm-6.7.1/include  acq_ldm_getshm.c
+ gcc -o acq_ldm_getshm -O acq_ldm_getshm.o shmem_lib.o
+ gcc -c -O -DNDEBUG  -I.. -I./g2 -I./gempak -I./zlib -I/usr/local/ldm/ldm-6.7.1/include  acq_ldm_freeshm.c
+ gcc -o acq_ldm_freeshm -O acq_ldm_freeshm.o shmem_lib.o
+
+
+
+
+depbase=`echo shmem_lib.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+        gcc -DHAVE_CONFIG_H -I. -I..  -g -O2 -MT shmem_lib.o -MD -MP -MF $depbase.Tpo -c -o shmem_lib.o shmem_lib.c &&\
+        mv -f $depbase.Tpo $depbase.Po
+
+depbase=`echo retrans.o | sed 's|[^/]*$|.deps/&|;s|\.o$||'`;\
+        gcc -DHAVE_CONFIG_H -I. -I..   -I../grib2 -I../gempak -I../zlib -I../ulog -I../protocol -I../pq -I../misc   -g -O2 -MT retrans.o -MD -MP -MF $depbase.Tpo -c -o retrans.o retrans.c &&\
+        mv -f $depbase.Tpo $depbase.Po
+
+
+
+gcc -g -O2 -o .libs/noaaportIngester noaaportIngester.o grib2name.o gribid.o ldmProductQueue.o png_io.o process_prod.o readpdb.o readpdh.o readpsh.o readsbn.o redbook_header.o wgrib.o wmo_header.o fifo.o fileReader.o getFacilityName.o multicastReader.o productMaker.o reader.o retrans.o shmem_lib.o  ../lib/.libs/libldm.so ../libxml2/.libs/libxml2.so -ldl -lz -lm ../gempak/.libs/lib.a ../libpng/.libs/libpng.a ../libpng/.libs/libpng12.a ../zlib/.libs/lib.a ../grib2/.libs/lib.a -lpthread  -Wl,--rpath -Wl,/root/lib -Wl,--rpath -Wl,/usr/local/lib
+
+gcc -g -O2 -o .libs/dvbs_multicast dvbs_multicast.o shmfifo.o grib2name.o gribid.o ldmProductQueue.o png_io.o process_prod.o readpdb.o readpdh.o readpsh.o readsbn.o redbook_header.o wgrib.o wmo_header.o  /usr/local/ldm/lib/libldm.so ../libxml2/.libs/libxml2.so  ../grib2/.libs/lib.a  ../gempak/.libs/lib.a ../zlib/.libs/lib.a ../libpng/.libs/libpng.a /usr/lib/libz.a  -ldl -lm -lpthread  -Wl,--rpath -Wl,/usr/local/ldm/lib
+
+gcc -g -O2 -o .libs/readnoaaport readnoaaport.o shmfifo.o grib2name.o gribid.o ldmProductQueue.o png_io.o process_prod.o readpdb.o readpdh.o readpsh.o readsbn.o redbook_header.o wgrib.o wmo_header.o  ../lib/.libs/libldm.so ../libxml2/.libs/libxml2.so ../grib2/.libs/lib.a  ../gempak/.libs/lib.a ../zlib/.libs/lib.a ../libpng/.libs/libpng.a /usr/lib/libz.a  -ldl -lm -lpthread  -Wl,--rpath -Wl,/usr/local/ldm/lib 

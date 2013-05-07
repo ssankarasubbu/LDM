@@ -51,7 +51,7 @@ CPPFLAGS		= \
 	-I$(top_srcdir)/misc \
 	@CPPFLAGS@
 
-bin_PROGRAMS		= dvbs_multicast readnoaaport noaaportIngester
+bin_PROGRAMS		= dvbs_multicast readnoaaport noaaportIngester acq_ldm_getshm acq_ldm_freeshm
 dist_bin_SCRIPTS	= \
 	dvbs_goes \
 	dvbs_nwstg \
@@ -87,7 +87,12 @@ noaaportIngester_SOURCES	= noaaportIngester.c $(COMMON_SOURCES) \
 	getFacilityName.c getFacilityName.h \
 	multicastReader.c multicastReader.h \
 	productMaker.c productMaker.h \
-	reader.c reader.h
+	reader.c reader.h \
+	retrans.c \
+	shmem_lib.c
+
+acq_ldm_getshm_SOURCES	= acq_ldm_getshm.c shmem_lib.c
+acq_ldm_freeshm_SOURCES	= acq_ldm_freeshm.c shmem_lib.c 
 
 LDADD 			= \
       $(top_builddir)/lib/libldm.la -lxml2
