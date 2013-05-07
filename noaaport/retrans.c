@@ -321,7 +321,7 @@ int generate_retrans_rqst(ACQ_TABLE *p_acqtable,
 {
         static char FNAME[] = "generate_retrans_rqst";
 
-        static ulong request_numb;
+        static unsigned long request_numb;
         int prod_lost;
         PIPE_RETRANSMIT_HDR pipe_request_hdr;
         PIPE_RETRANSMIT_HDR *p_pipe_requesthdr;
@@ -622,7 +622,7 @@ int prod_retrans_update_entry(
         PROD_RETRANS_ENTRY *p_retrans_entry, /* ptr to retrans entry */
         int             in_index,                       /* entry index */
         long    prod_seqno,                     /* prod_seqno */
-        ushort  in_run_id,                      /* run_id */
+        unsigned short  in_run_id,                      /* run_id */
         int             entry_flag,                     /* retrans entry flag */
         int             err_cause)                      /* err cause entry flag */
 {
