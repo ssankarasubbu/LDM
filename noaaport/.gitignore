@@ -39,3 +39,5 @@ Makefile.in
 Makefile
 configure
 configure
+/acq_ldm_freeshm
+/acq_ldm_getshm
