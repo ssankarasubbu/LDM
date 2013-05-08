@@ -7,6 +7,8 @@ DESCRIPTION
 RETURNS
 
 *******************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <signal.h>
 #include <sys/types.h>
@@ -16,6 +18,8 @@ RETURNS
 
 #include <sys/ipc.h>
 #include <sys/shm.h>
+
+#include "shmem_lib.h"
 
 #define DEBUG(x) printf("service: x = %d\n", (x))
 
@@ -92,7 +96,7 @@ int SHMnumber;		/* shared memory segment key */
 	
 	/* attach a shared memory area */
 	/* convert the identifier to an address */
-	if ((int)(address = shmat(shmid, (char *)0, 0)) == -1) {
+	if ((address = shmat(shmid, (char *)0, 0)) == (void*)-1) {
 		sprintf(errbuf, "com_shmAttach() shmat - %s", strerror(errno));
 		logError(errbuf);
 		return((char *)0);

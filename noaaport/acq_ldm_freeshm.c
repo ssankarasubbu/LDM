@@ -10,13 +10,14 @@ RETURNS
 
 *******************************************************************************/
 
+#include "config.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
 #include <sys/ipc.h>
 #include <sys/types.h>
-
+#include <unistd.h>
 #include <errno.h>
 #include <ctype.h>
 #include "retrans.h"
@@ -42,7 +43,7 @@ int cmd_line(int argc, char *argv[], INPUT *p_input);
 
 char	PNAME[40];
 
-main(argc, argv)	
+int main(argc, argv)
 int argc;
 char **argv;
 {
@@ -130,6 +131,7 @@ cmd_line(
 			case '?': {
 				usage();
 			}
+            /* no break */
 			default:
 			break;
 		}  /* end switch */

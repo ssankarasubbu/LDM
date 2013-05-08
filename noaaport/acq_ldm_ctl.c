@@ -259,12 +259,13 @@ int 	acqctl_do_action(int flag, INPUT *p_input, ACQ_TABLE *p_acqtable);
 
 
 
+#if 0
 static 	int	acqctl_do_caution(char *in_command, INPUT *p_input);
 static 	int	acqctl_do_confirm(char *in_command, INPUT *p_input);
+static int acqctl_get_pid(int host_id, pid_t client_pid);
+#endif
 static 	int	acqctl_get_response(INPUT *p_input, char *in_command, int in_question, 
 			int *rtn_code);
-
-static int acqctl_get_pid(int host_id, pid_t client_pid);
 
 int do_new_menu();
 
@@ -273,8 +274,8 @@ int do_new_menu();
 
 /* Global variables */
 	int	global_i_cpiofd;	/* cpiofd */
-	ulong	*global_logpipe_flag;	/* global logpipe flag */
-	ulong	*global_logconsole_flag; /* global logpipe flag */
+	unsigned long	*global_logpipe_flag;	/* global logpipe flag */
+	unsigned long	*global_logconsole_flag; /* global logpipe flag */
 	int	global_logpipe_fd;	/* global logpipe fd */
 	int	global_origin_code;	/* global origin code */
 	int	global_NCF_flag = 0; /* NCF only commands */
@@ -451,6 +452,7 @@ char **argv;
 
 }
 
+#if 0
 /******************************************************************************
 	Name
 		acqctl_do_confirm
@@ -485,7 +487,9 @@ static int acqctl_do_confirm(char *in_command, INPUT *p_input)
 		PNAME, in_command);
 	return(0);
 } /* end routine acqctl_do_confirm() */
+#endif
 
+#if 0
 /******************************************************************************
 	Name
 		acqctl_do_caution
@@ -522,6 +526,7 @@ static int acqctl_do_caution(char *in_command, INPUT *p_input)
 		PNAME, in_command);
 	return(0);
 } /* end routine acqctl_do_caution() */
+#endif
 
 /******************************************************************************
 	Name
@@ -942,7 +947,7 @@ acqctl_do_action(
 
 
 
-
+#if 0
 /*****************************************************************************
 	Name
 		acqctl_get_pid
@@ -1004,6 +1009,7 @@ acqctl_get_pid(
 	return last_pid;
 
 } /* end routine acqctl_get_pid */
+#endif
 
 /******************************************************************************
 	Name  
@@ -1161,6 +1167,7 @@ cmd_line(
 		case '?': {
 			usage();
 		}
+        /* no break */
 		default:
 		        break; 
 	    }  /* end switch */

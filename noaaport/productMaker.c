@@ -22,7 +22,9 @@
 #include "fifo.h"
 #include "ldmProductQueue.h"
 #include "nport.h"
+#include "png_io.h"
 #include "productMaker.h"     /* Eat own dog food */
+#include "process_prod.h"
 
 #include "retrans.h"
 #include "acq_shm_lib.h"
@@ -164,9 +166,8 @@ void* pmStart(
  	              udebug("Global cpio_addr  = 0x%x Global cpio_fd = %d \n",global_cpio_addr,global_cpio_fd);
                 }else{
                     uerror("Invalid multicast address provided");
-                    status = -1;
-	  	    return status;	
-                 }
+        	  	    return (void*)-1;
+                }
 
 		 retrans_tbl_size = sizeof(PROD_RETRANS_TABLE);
 
@@ -187,16 +188,14 @@ void* pmStart(
 		p_prod_retrans_table = (PROD_RETRANS_TABLE *) malloc (retrans_tbl_size);
 		if(p_prod_retrans_table == NULL){
 		   uerror("Unable to allocate memory for retrans table..Quitting.\n");
-                   status = -1;
-	  	   return status;	
+	  	   return (void*)-1;
 		}
 
 		if( init_retrans(&p_prod_retrans_table) < 0 ){
 		  uerror("Error in initializing retrans table \n");
 		  if(p_prod_retrans_table)
-			free(p_prod_retrans_table);
-                  status = -1;
-	  	  return status;	
+            free(p_prod_retrans_table);
+	  	  return (void*)-1;
 		}	
 
        GET_SHMPTR(global_acq_tbl,ACQ_TABLE,ACQ_TABLE_SHMKEY,DEBUGGETSHM);
@@ -223,8 +222,7 @@ void* pmStart(
 			free(acq_tbl);
 		if(p_prod_retrans_table)
 		  free(p_prod_retrans_table);
-                status = -1;
-	  	return status;	
+	  	return (void*)-1;
 	 }
 
 	 acq_tbl->pid = getpid();

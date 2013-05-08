@@ -12,6 +12,7 @@ RETURNS
 #ifndef acq_shm_lib_h
 #define acq_shm_lib_h
 
+#include "shmem_lib.h"
 
 #define SHM_REUSE_YES 1		/* reuse shared memory if possible */
 #define SHM_REUSE_NO 0		/* do not reuse shared memory if possible */

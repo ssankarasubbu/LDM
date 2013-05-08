@@ -12,6 +12,8 @@
 
 const char *s_pds_center(unsigned char center, unsigned char subcenter);
 const char *s_pds_model(unsigned char center, unsigned char model);
+int decode_g2gnum ( gribfield *gfld );
+int wmo_to_gridid (char *TT, char *AA );
 
 void	grib2name ( char *data, size_t sz, char *wmohead, char *ident )
 {

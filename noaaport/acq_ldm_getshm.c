@@ -9,15 +9,18 @@ DESCRIPTION
 RETURNS
 
 *******************************************************************************/
+#include "config.h"
+
 #include <stdio.h>
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/types.h>
-
+#include <unistd.h>
 #include <errno.h>
 #include <ctype.h>
 #include "retrans.h"
 #include "acq_shm_lib.h"
+#include "shmem_lib.h"
 
 #define DEBUG(x) printf("service: x = %d\n", (x))
 
@@ -81,7 +84,7 @@ int cmd_line(int argc, char *argv[], INPUT *p_input);
 }
 char	PNAME[40];
 int MaxLinks;
-main(argc, argv)	/* argument #1 is a test SHMnumber */
+int main(argc, argv)	/* argument #1 is a test SHMnumber */
 int argc;
 char **argv;
 {
@@ -239,6 +242,7 @@ cmd_line(
 			case '?': {
 				usage();
 			}
+            /* no break */
 			default:
 			break;
 		}  /* end switch */

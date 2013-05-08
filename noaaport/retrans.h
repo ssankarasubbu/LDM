@@ -259,7 +259,7 @@ typedef struct prod_retrans_entry {
 
 /* File retransmission entry info */
 typedef struct entry_info {
-	int     retrans_entry_base_offset;  /* base entry table ptr */
+	int     retrans_entry_base_offset;  /* byte-offset from this member to start of entry array */
 	int     entry_bytes;                /* bytes per entry */
 	int     numb_entries;               /* numb entries for this type */
 	int     index_last;                 /* last index entry for this type */
@@ -480,6 +480,15 @@ BUFF_HDR           *buff_hdr;
 
 
 
+/**
+ *   get_cpio_addr -  Routine to get cpio address
+ *   This routine is used to determine the channel based on the
+ *   multicast address.
+ *
+ *   @retval 0-7    Channel number
+ *
+**/
+int get_cpio_addr(char *addr);
 
 int init_retrans(PROD_RETRANS_TABLE **p_prod_retrans_table);
 int init_acq_table(ACQ_TABLE	*p_acq_table);
@@ -489,6 +498,18 @@ int generate_retrans_rqst(ACQ_TABLE *p_acqtable,
 		int rqst_cause);
 
 int prod_retrans_ck(ACQ_TABLE *acq_tbl, BUFF_HDR *buff_hdr, time_t *orig_arrive_time);
+
+/**
+ *   init_buff_hdr -  Routine to initialize buffer header table
+ *   This routine is used to initialize the buffer header table setup
+ *   on the heap.
+ *
+ *   @retval -1    Error
+ *   @retval  0    Success
+ *
+**/
+int init_buff_hdr(BUFF_HDR      *p_buff_hdr);
+
 int do_prod_lost( BUFF_HDR *buff_hdr, ACQ_TABLE *acq_tbl);
 int prod_retrans_update_entry(ACQ_TABLE *p_acqtable, BUFF_HDR *p_buffhdr,
 		PROD_RETRANS_ENTRY_INFO *p_retrans_entry_info,

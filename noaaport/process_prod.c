@@ -25,6 +25,8 @@
 #include "inetutil.h"
 #include "log.h"
 
+void	grib2name ( char *data, size_t sz, char *wmohead, char *ident );
+
 datastore *dataheap=NULL;
 int nextfrag = 0, MAXFRAGS=1000;
 
@@ -184,6 +186,7 @@ static feedtypet feedpoint = NPOINT;
 	  break;
 	default:
 	  prod.info.feedtype = feedother;
+      /* no break */
 	}
     }
   else if (psh->ptype < 4)
@@ -215,6 +218,7 @@ static feedtypet feedpoint = NPOINT;
 	  break;
 	default:
 	  prod.info.feedtype = feedother;
+      /* no break */
 	}
     }
   prod.info.seqno = nprod.seqno;

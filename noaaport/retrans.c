@@ -1,10 +1,12 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <ctype.h>
+#include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include "retrans.h"
+#include "ulog.h"
 
 #define logMsg  printf
 
@@ -57,7 +59,6 @@ int init_retrans(PROD_RETRANS_TABLE **pp_prod_retrans_table)
 {
 
         static char             FNAME[] = "init_retrans";
-        long int                entry_base;             /* base of entry */
         long int                ii,iii;                 /* loop counter */
         int                     flags, rtn_val;
         static const char*      utc_time = "UTC";
@@ -71,13 +72,18 @@ int init_retrans(PROD_RETRANS_TABLE **pp_prod_retrans_table)
 
         pl_prod_retrans_table = *pp_prod_retrans_table;
 
-        if(ulogIsDebug())
-                udebug("%s Begin init retrans_table   base=0x%x\n", FNAME, pl_prod_retrans_table);
+        udebug("%s Begin init retrans_table   base=0x%x\n", FNAME, pl_prod_retrans_table);
 
         global_time_zone = (char *) utc_time;
 
         if (pl_prod_retrans_table != NULL){
                 /* IMPORTANT, special init for local prod_retrans_table */
+
+                ii = 0; /* For now set to 0; Later can setup retrans table depending on the channel type */
+                pl_prod_retrans_table->entry_info[GET_RETRANS_TABLE_TYP(sbn_type)].
+                        numb_entries = GET_RETRANS_CHANNEL_ENTRIES(sbn_type);
+                udebug("%s Total retrans numb_entries for channel %s of sbn_type (%d) = %d \n",
+                        FNAME, sbn_channel_name,sbn_type,pl_prod_retrans_table->entry_info[ii].numb_entries);
 
                 /* Assume entries directly follow the entry info for all links */
                 /*  and each is variable size */
@@ -85,24 +91,13 @@ int init_retrans(PROD_RETRANS_TABLE **pp_prod_retrans_table)
                 /*   ie, GOES_EAST(0), NMC2(1), NMC(2), NOAAPORT_OPT(3), NMC3(4), NMC1(5) */
                 /*    note NMC2 was GOES_WEST */
                 /*   as per RETRANS_TBL_TYP_xxxxxxx */
-                entry_base = (int)pl_prod_retrans_table + sizeof(PROD_RETRANS_TABLE);
-
-                ii = 0; /* For now set to 0; Later can setup retrans table depending on the channel type */
-                pl_prod_retrans_table->entry_info[GET_RETRANS_TABLE_TYP(sbn_type)].
-                        numb_entries = GET_RETRANS_CHANNEL_ENTRIES(sbn_type);
-                if(ulogIsDebug()){
-                        udebug("%s Total retrans numb_entries for channel %s of sbn_type (%d) = %d \n", 
-                                       FNAME, sbn_channel_name,sbn_type,pl_prod_retrans_table->entry_info[ii].numb_entries);
-                }
 
                 pl_prod_retrans_table->entry_info[GET_RETRANS_TABLE_TYP(sbn_type)].
-                        retrans_entry_base_offset = (int)entry_base -
-                                (int)(&pl_prod_retrans_table->entry_info[GET_RETRANS_TABLE_TYP(sbn_type)].
-                                        retrans_entry_base_offset);
-
-                entry_base += 
-                        (pl_prod_retrans_table->entry_info[GET_RETRANS_TABLE_TYP(sbn_type)].
-                                numb_entries * (sizeof(PROD_RETRANS_ENTRY)));
+                        retrans_entry_base_offset = (int)
+                                ((char*)pl_prod_retrans_table +
+                                sizeof(*pl_prod_retrans_table) -
+                                (char*)&pl_prod_retrans_table->entry_info[GET_RETRANS_TABLE_TYP(sbn_type)].
+                                retrans_entry_base_offset);
 
                 /*ii = GET_RETRANS_TABLE_TYP(sbn_type);*/
                         p_prod_retrans_table->entry_info[ii].entry_bytes = 
@@ -129,8 +124,8 @@ int init_retrans(PROD_RETRANS_TABLE **pp_prod_retrans_table)
                                 &pl_prod_retrans_table->entry_info[ii];
 
                         p_retrans_entry =
-                                (PROD_RETRANS_ENTRY *)(((int)&p_retrans_entry_info->
-                                        retrans_entry_base_offset) +
+                                (PROD_RETRANS_ENTRY *)((char*)&p_retrans_entry_info->
+                                        retrans_entry_base_offset +
                                         p_retrans_entry_info->retrans_entry_base_offset);
         
                         /* Now clear each entry */
@@ -744,7 +739,7 @@ int prod_retrans_get_addr(
                 p_retrans_entry_info = 
                         &prod_retrans_table->entry_info[retrans_table_typ];
                 p_retrans_entry = (PROD_RETRANS_ENTRY *)
-                        (((int)&p_retrans_entry_info->retrans_entry_base_offset) +
+                        ((char*)&p_retrans_entry_info->retrans_entry_base_offset +
                                 p_retrans_entry_info->retrans_entry_base_offset);
         } else {
                 /* have invalid table type */
@@ -765,9 +760,9 @@ int prod_retrans_get_addr(
 
         if(p_retrans_entry_info->numb_entries == 0) {
                 /* assume have no entries */
-                uerror("%s OK prod_retrans_table entry_info=0x%x numb_entry=%d\n",
+                uerror("%s OK prod_retrans_table entry_info=%p numb_entry=%d\n",
                         FNAME,
-                        (unsigned int)*in_p_retrans_entry_info,
+                        (void*)*in_p_retrans_entry_info,
                         p_retrans_entry_info->numb_entries);
                 return(ERROR);
         }
